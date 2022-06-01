@@ -1,0 +1,11 @@
+HTTP:
+  host: "0.0.0.0"
+  port: "8080"
+
+DATABASE:
+  name: ""
+  port: "5432"
+
+TELEGRAM:
+  token: "5568592349:AAFoLMsEza6rzyAuTQDsTW9Um2ZRCMX4H90"
+  debug: False

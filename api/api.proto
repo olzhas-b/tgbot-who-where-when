@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package api;
+
+
+option go_package = "./;api";
+
+message Message {
+  int64 id = 1;
+}
+
+message Result {
+  string text = 1;
+}
+
+service Game {
+  rpc Start(Message) returns(Result){}
+}
