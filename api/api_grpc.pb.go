@@ -8,6 +8,7 @@ package api
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -22,7 +23,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameClient interface {
-	Start(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Result, error)
+	Start(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	CheckAnswer(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Score(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	GetTop10Players(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Notification(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (Game_NotificationClient, error)
 }
 
 type gameClient struct {
@@ -33,8 +38,8 @@ func NewGameClient(cc grpc.ClientConnInterface) GameClient {
 	return &gameClient{cc}
 }
 
-func (c *gameClient) Start(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
+func (c *gameClient) Start(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
 	err := c.cc.Invoke(ctx, "/api.Game/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -42,11 +47,74 @@ func (c *gameClient) Start(ctx context.Context, in *Message, opts ...grpc.CallOp
 	return out, nil
 }
 
+func (c *gameClient) CheckAnswer(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/api.Game/CheckAnswer", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) Score(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/api.Game/Score", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) GetTop10Players(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/api.Game/GetTop10Players", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameClient) Notification(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (Game_NotificationClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Game_ServiceDesc.Streams[0], "/api.Game/Notification", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gameNotificationClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Game_NotificationClient interface {
+	Recv() (*Response, error)
+	grpc.ClientStream
+}
+
+type gameNotificationClient struct {
+	grpc.ClientStream
+}
+
+func (x *gameNotificationClient) Recv() (*Response, error) {
+	m := new(Response)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GameServer is the server API for Game service.
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
-	Start(context.Context, *Message) (*Result, error)
+	Start(context.Context, *Request) (*Response, error)
+	CheckAnswer(context.Context, *Request) (*Response, error)
+	Score(context.Context, *Request) (*Response, error)
+	GetTop10Players(context.Context, *Request) (*Response, error)
+	Notification(*empty.Empty, Game_NotificationServer) error
 	mustEmbedUnimplementedGameServer()
 }
 
@@ -54,8 +122,20 @@ type GameServer interface {
 type UnimplementedGameServer struct {
 }
 
-func (UnimplementedGameServer) Start(context.Context, *Message) (*Result, error) {
+func (UnimplementedGameServer) Start(context.Context, *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+}
+func (UnimplementedGameServer) CheckAnswer(context.Context, *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAnswer not implemented")
+}
+func (UnimplementedGameServer) Score(context.Context, *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Score not implemented")
+}
+func (UnimplementedGameServer) GetTop10Players(context.Context, *Request) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTop10Players not implemented")
+}
+func (UnimplementedGameServer) Notification(*empty.Empty, Game_NotificationServer) error {
+	return status.Errorf(codes.Unimplemented, "method Notification not implemented")
 }
 func (UnimplementedGameServer) mustEmbedUnimplementedGameServer() {}
 
@@ -71,7 +151,7 @@ func RegisterGameServer(s grpc.ServiceRegistrar, srv GameServer) {
 }
 
 func _Game_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Message)
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -83,9 +163,84 @@ func _Game_Start_Handler(srv interface{}, ctx context.Context, dec func(interfac
 		FullMethod: "/api.Game/Start",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).Start(ctx, req.(*Message))
+		return srv.(GameServer).Start(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_CheckAnswer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).CheckAnswer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Game/CheckAnswer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).CheckAnswer(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_Score_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).Score(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Game/Score",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).Score(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_GetTop10Players_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).GetTop10Players(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Game/GetTop10Players",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).GetTop10Players(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Game_Notification_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(empty.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GameServer).Notification(m, &gameNotificationServer{stream})
+}
+
+type Game_NotificationServer interface {
+	Send(*Response) error
+	grpc.ServerStream
+}
+
+type gameNotificationServer struct {
+	grpc.ServerStream
+}
+
+func (x *gameNotificationServer) Send(m *Response) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // Game_ServiceDesc is the grpc.ServiceDesc for Game service.
@@ -99,7 +254,25 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Start",
 			Handler:    _Game_Start_Handler,
 		},
+		{
+			MethodName: "CheckAnswer",
+			Handler:    _Game_CheckAnswer_Handler,
+		},
+		{
+			MethodName: "Score",
+			Handler:    _Game_Score_Handler,
+		},
+		{
+			MethodName: "GetTop10Players",
+			Handler:    _Game_GetTop10Players_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Notification",
+			Handler:       _Game_Notification_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "api/api.proto",
 }

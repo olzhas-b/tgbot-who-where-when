@@ -1,11 +1,22 @@
-HTTP:
+http:
   host: "0.0.0.0"
   port: "8080"
 
-DATABASE:
-  name: ""
+database:
+  host: "ec2-34-248-169-69.eu-west-1.compute.amazonaws.com"
+  name: "demo702cgr2ogu"
   port: "5432"
+  user: "prgsupezuxwnyl"
+  password: "37e3acc567a1544135dc73692490c626b7dfeb885d74268eba1fcde46e91e8a3!"
 
-TELEGRAM:
-  token: "5568592349:AAFoLMsEza6rzyAuTQDsTW9Um2ZRCMX4H90"
+telegram:
+  token: ""
   debug: False
+
+#  host=ec2-34-248-169-69.eu-west-1.compute.amazonaws.com user=prgsupezuxwnyl dbname=demo702cgr2ogu password=37e3acc567a1544135dc73692490c626b7dfeb885d74268eba1fcde46e91e8a3! port=5432 sslmode=disable
+#  goose postgres "postgres://prgsupezuxwnyl:37e3acc567a1544135dc73692490c626b7dfeb885d74268eba1fcde46e91e8a3@ec2-34-248-169-69.eu-west-1.compute.amazonaws.com:5432/demo702cgr2ogu" down
+
+
+#  DBSTRING="host=localhost user=root password=root dbname=rootdb sslmode=disable"
+#
+#  goose postgres "$DBSTRING" up
