@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: olzhas
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: olzhas_grpc-server-deployment
+  namespace: olzhas
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: grpc
+  template:
+    metadata:
+      namespace: olzhas
+      labels:
+        app: grpc
+    spec:
+      containers:
+        - name: grpc
+          image: cr.yandex/crpa8gap9g6vl6hshofn/grpc-server:__VERSION__
+          imagePullPolicy: Always
