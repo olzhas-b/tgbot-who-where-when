@@ -15,7 +15,7 @@ build:
   script:
     - docker login --username iam --password-stdin cr.yandex < $REGISTRY_IAM_TOKEN
     - docker build -f dockerfiles/Dockerfile_server -t cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-server:gitlab-$CI_COMMIT_SHORT_SHA .
-    - docker push cr.yandex/crpa8gap9g6vl6hshofn/olzhas_grpc-server:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker push cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-server:gitlab-$CI_COMMIT_SHORT_SHA
 
 deploy:
   image: cr.yandex/crpa8gap9g6vl6hshofn/builder:latest
