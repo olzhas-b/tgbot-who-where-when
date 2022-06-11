@@ -20,6 +20,11 @@ build:
     - docker build -f dockerfiles/Dockerfile_client -t cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-client:gitlab-$CI_COMMIT_SHORT_SHA .
     - docker push cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-client:gitlab-$CI_COMMIT_SHORT_SHA
 
+test:
+  stage: test
+  image: cr.yandex/crpa8gap9g6vl6hshofn/dind:latest
+  script:
+    - go test ./...
 
 deploy:
   image: cr.yandex/crpa8gap9g6vl6hshofn/builder:latest
