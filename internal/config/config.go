@@ -11,8 +11,13 @@ var config Config
 type Config struct {
 	HTTP struct {
 		Port string `yaml:"port"`
+		Host string `yaml:"host"`
 		Name string `yaml:"name"`
 	} `yaml:"http"`
+	GRPC struct {
+		Port string `yaml:"port"`
+		Host string `yaml:"host"`
+	} `yaml:"grpc"`
 	Database struct {
 		Host     string `yaml:"host"`
 		Port     string `yaml:"port"`

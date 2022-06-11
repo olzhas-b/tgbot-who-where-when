@@ -12,7 +12,6 @@ create table leader_board (
 create index chat_id_index on leader_board(chat_id);
 create index user_id_index on leader_board(user_id);
 
-
 create table question (
                           id serial primary key,
                           text text,

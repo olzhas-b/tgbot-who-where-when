@@ -17,11 +17,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("server.cfg.InitConfig got err %v", err)
 	}
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", cfg.HTTP.Name, cfg.HTTP.Port))
+	grpcAddress := fmt.Sprintf(":%s", cfg.GRPC.Port)
+	listener, err := net.Listen("tcp", grpcAddress)
 	if err != nil {
 		log.Fatalf("server.cfg.Listen got err %v", err)
+	} else {
+		log.Println("tcp was listen successfully: ", grpcAddress)
 	}
-
 	db := db2.InitDB(cfg)
 	repo := repository.New(db)
 	server := service.NewGameServiceServer(repo)

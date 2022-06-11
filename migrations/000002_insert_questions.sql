@@ -3662,4 +3662,4 @@ INSERT INTO public.question (id, text, answer) VALUES (3658, 'Состав во�
 
 
 -- +goose Down
-delete from question;
+DELETE FROM question;

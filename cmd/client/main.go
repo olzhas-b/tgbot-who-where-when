@@ -14,6 +14,7 @@ import (
 	"gitlab.ozon.dev/hw/homework-2/tools"
 	"golang.org/x/sync/semaphore"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"log"
 	"runtime"
@@ -21,33 +22,32 @@ import (
 )
 
 func main() {
-	opts := []grpc.DialOption{
-		grpc.WithInsecure(),
-	}
 	// read config from config.yaml
 	cfg, err := config.InitConfig("config.yaml")
 	if err != nil {
 		log.Fatalf("client.main.config.InitConfig got err %v", err)
 	}
-	log.Println("trying to connect grpcServer")
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", cfg.HTTP.Name, cfg.HTTP.Port), opts...)
+	//for local
+	//grpcAddress := fmt.Sprintf("%s:%s", cfg.GRPC.Host, cfg.GRPC.Port)
+	grpcAddress := fmt.Sprintf("dns:///grpc_server:%s", cfg.GRPC.Port)
+	log.Println("trying to connect grpcServer:", grpcAddress)
+	conn, err := grpc.Dial(grpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("client.main.grpc.Dial got err %v", err)
 	}
+	defer conn.Close()
+
 	client := api.NewGameClient(conn)
 
-	// create bot
 	bot := tg.NewBot()
 	updateCfg := tg.NewUpdateConfig()
 	updates := bot.GetUpdatesChan(updateCfg)
 
-	// handle notification from server
 	notif, err := client.Notification(context.Background(), &empty.Empty{})
 	if err != nil {
 		log.Println(err)
 	}
 	go handleNotification(bot, notif)
-
 	// limited max goroutine with semaphore
 	mxGoroutine := 4 * runtime.NumCPU()
 	sem := semaphore.NewWeighted(int64(mxGoroutine))
@@ -60,7 +60,8 @@ func main() {
 		}
 		update := update
 		go func() {
-			ctx, _ := context.WithTimeout(context.Background(), time.Minute*30)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Minute*30)
+			defer cancel()
 			defer sem.Release(1)
 			handleMessage(ctx, bot, &client, update)
 		}()
