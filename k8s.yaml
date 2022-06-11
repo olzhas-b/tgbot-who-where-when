@@ -20,6 +20,9 @@ spec:
         app: grpc
     spec:
       containers:
-        - name: grpc
+        - name: grpc-server
           image: cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-server:__VERSION__
+          imagePullPolicy: Always
+        - name: grpc-client
+          image: cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-client:__VERSION__
           imagePullPolicy: Always
