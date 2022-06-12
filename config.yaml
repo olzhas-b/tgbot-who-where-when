@@ -3,16 +3,24 @@ http:
   port: "8081"
 
 grpc:
-  host: "0.0.0.0"
+  host: "dns:///grpc_server"
   port: "8080"
 
 database:
-  host: "ec2-34-248-169-69.eu-west-1.compute.amazonaws.com"
-  name: "demo702cgr2ogu"
+  host: "postgres-db"
+  name: "postgres"
   port: "5432"
-  user: "prgsupezuxwnyl"
-  password: "37e3acc567a1544135dc73692490c626b7dfeb885d74268eba1fcde46e91e8a3!"
+  user: "postgres"
+  password: "postgres"
 
 telegram:
   token: "5350506452:AAHoFRSwfnHcnWExJK8comgQX0jH1-mHPZw"
   debug: False
+
+# heroku database
+#database:
+#  host: "ec2-34-248-169-69.eu-west-1.compute.amazonaws.com"
+#  name: "demo702cgr2ogu"
+#  port: "5432"
+#  user: "prgsupezuxwnyl"
+#  password: "37e3acc567a1544135dc73692490c626b7dfeb885d74268eba1fcde46e91e8a3"

@@ -29,7 +29,7 @@ func main() {
 	}
 	//for local
 	//grpcAddress := fmt.Sprintf("%s:%s", cfg.GRPC.Host, cfg.GRPC.Port)
-	grpcAddress := fmt.Sprintf("dns:///grpc_server:%s", cfg.GRPC.Port)
+	grpcAddress := fmt.Sprintf("%s:%s", cfg.GRPC.Host, cfg.GRPC.Port)
 	log.Println("trying to connect grpcServer:", grpcAddress)
 	conn, err := grpc.Dial(grpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -101,7 +101,7 @@ func handleMessage(ctx context.Context, bot *tg.Bot, client *api.GameClient, upd
 	case consts.Help:
 		bot.Send(models.Response{
 			ChatID: request.ChatID,
-			Text:   tools.ConvertToEscapedString(consts.Help),
+			Text:   tools.ConvertToEscapedString(consts.HelpMsg),
 		})
 	}
 }

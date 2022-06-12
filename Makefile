@@ -16,9 +16,8 @@ dockerCont := `(docker ps -qa)`
 dockerVol := `(docker volume ls -q)`
 
 down:
-	docker rmi -f homework-2_client homework-2_server tg_server tg_client homework-2_migration
-	docker rm -f $(dockerCont)
-	docker volume rm -f $(dockerVol)
+	docker rmi -f homework-2_client homework-2_server homework-2_migration
+	docker rm -f postgres-db grpc_server grpc_client migration
 
 up:
 	docker build . -f dockerfiles/Dockerfile_server -t tg_server

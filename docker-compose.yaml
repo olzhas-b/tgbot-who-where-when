@@ -1,33 +1,29 @@
 version: "3.7"
 
 services:
-#  postgres-db:
-#    image: postgres:11
-#    restart: always
-##    healthcheck:
-##      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
-##      interval: 5s
-##      timeout: 5s
-##      retries: 2
-#    networks:
-#      - telegram_net
-#    environment:
-#      POSTGRES_PASSWORD: "postgres"
-#      POSTGRES_DB: "postgres"
-#      POSTGRES_USER: "postgres"
-#      POSTGRES_HOST: "postgres-db"
-#      POSTGRES_PORT: 5432
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - data:/var/lib/postgresql/data
-#    container_name: postgres-db
+  postgres-db:
+    image: postgres:11
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 2
+    networks:
+      - telegram_net
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "postgres"
+    ports:
+      - '5432:5432'
+    volumes:
+      - data:/var/lib/postgresql/data
+    container_name: postgres-db
 
   server:
     networks:
       - telegram_net
-    links:
-      - postgres-db
     ports:
       - "8080:8080"
     restart: always
@@ -51,22 +47,21 @@ services:
       dockerfile: dockerfiles/Dockerfile_client
     container_name: grpc_client
 
-#  migration:
-#    networks:
-#      - telegram_net
-#    links:
-#      - postgres-db
-#    restart: on-failure
-#    depends_on:
-#      - postgres-db
-#    build:
-#      context: .
-#      dockerfile: dockerfiles/Dockerfile_migration
+  migration:
+    networks:
+      - telegram_net
+    restart: on-failure
+    depends_on:
+      - postgres-db
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile_migration
+    container_name: migration
 
 networks:
   telegram_net:
     driver: bridge
 
-#volumes:
-#  data:
-#   driver: local
+volumes:
+  data:
+   driver: local
