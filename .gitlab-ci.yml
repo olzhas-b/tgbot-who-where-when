@@ -1,6 +1,5 @@
 stages:
   - build
-  - test
   - deploy
 
 # variables:
@@ -19,14 +18,6 @@ build:
     - docker push cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-server:gitlab-$CI_COMMIT_SHORT_SHA
     - docker build -f dockerfiles/Dockerfile_client -t cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-client:gitlab-$CI_COMMIT_SHORT_SHA .
     - docker push cr.yandex/crpa8gap9g6vl6hshofn/olzhas-grpc-client:gitlab-$CI_COMMIT_SHORT_SHA
-    - docker build -f dockerfiles/Dockerfile_test -t cr.yandex/crpa8gap9g6vl6hshofn/olzhas-test:gitlab-$CI_COMMIT_SHORT_SHA .
-    - docker push cr.yandex/crpa8gap9g6vl6hshofn/olzhas-test:gitlab-$CI_COMMIT_SHORT_SHA
-
-test:
-  stage: test
-  image:  cr.yandex/crpa8gap9g6vl6hshofn/olzhas-test:gitlab-$CI_COMMIT_SHORT_SHA
-  script:
-    - go test ./...
 
 deploy:
   image: cr.yandex/crpa8gap9g6vl6hshofn/builder:latest
